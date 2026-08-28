@@ -1,0 +1,21 @@
+# ISSUE: 初回デプロイ（Render）
+# Render の Blueprint (render.yaml) を使ったデプロイ設定。
+# 実際のデプロイはRenderダッシュボード側でこのファイルを読み込んで行う。
+services:
+  - type: web
+    name: seabass-cup
+    env: ruby
+    plan: free
+    buildCommand: "bundle install && bin/rails assets:precompile"
+    startCommand: "bin/rails server -p $PORT -e production"
+    envVars:
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: seabass-cup-db
+          property: connectionString
+
+databases:
+  - name: seabass-cup-db
+    plan: free

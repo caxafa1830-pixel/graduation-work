@@ -1,0 +1,13 @@
+<%= render "top/scene_background" %>
+<div class="title-screen">
+  <h1>シーバスカップ</h1>
+  <p class="title-screen__copy">
+    天候や時間の都合で釣りに行けないルアー釣り経験者のための、<br>
+    ブラウザで遊べるアクション型ルアー釣りゲーム
+  </p>
+
+  <div class="title-screen__buttons">
+    <%= link_to "あそぶ", game_path, class: "btn btn--primary" %>
+    <%= link_to "操作説明を見る", how_to_play_path, class: "btn btn--secondary" %>
+  </div>
+</div>

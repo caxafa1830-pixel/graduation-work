@@ -1,0 +1,15 @@
+/log/*
+/tmp/*
+/storage/*
+/coverage/
+!/log/.keep
+!/tmp/.keep
+/public/assets
+.byebug_history
+/config/master.key
+/.env*
+!/.env.example
+/node_modules
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key

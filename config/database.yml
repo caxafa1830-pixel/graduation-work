@@ -1,0 +1,22 @@
+# MVPの段階ではDBを使用する機能はないが、README10章の技術スタック方針（Rails + PostgreSQL）
+# に合わせて構成だけ用意しておく。本リリースでusers/lures/user_lures/fields/catchesを追加する。
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
+  username: <%= ENV.fetch("DATABASE_USERNAME", "postgres") %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD", "") %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+
+development:
+  <<: *default
+  database: seabass_cup_development
+
+test:
+  <<: *default
+  database: seabass_cup_test
+
+production:
+  <<: *default
+  database: seabass_cup_production
+  url: <%= ENV["DATABASE_URL"] %>

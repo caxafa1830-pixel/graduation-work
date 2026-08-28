@@ -1,0 +1,17 @@
+<%= render "top/scene_background" %>
+<div class="how-to-play">
+  <h1>操作説明</h1>
+
+  <ul class="how-to-play__list">
+    <li><strong>キャスト</strong>：Enterキーを押しっぱなしでパワーを溜め、離すとキャストします。</li>
+    <li><strong>リトリーブ（巻く）</strong>：Enterキーを連打する速さがリール速度になります。</li>
+    <li><strong>トゥイッチ</strong>：Spaceキーを1回押すとルアーが跳ねます。</li>
+    <li><strong>フッキング</strong>：ルアーの上に「！」マークが出たらシーバスがかかった合図です。すぐにEnterキーを押してアワセましょう。</li>
+    <li><strong>ファイト</strong>：Enterキーを押して巻き、離してテンションを緩めます。</li>
+  </ul>
+
+  <div class="how-to-play__buttons">
+    <%= link_to "はじめる", game_path, class: "btn btn--primary" %>
+    <%= link_to "戻る", root_path, class: "btn btn--secondary" %>
+  </div>
+</div>

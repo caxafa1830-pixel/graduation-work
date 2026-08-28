@@ -1,0 +1,34 @@
+<div data-controller="seabass-game" class="game-screen">
+  <canvas data-seabass-game-target="canvas" width="640" height="360"></canvas>
+
+  <div class="game-screen__panel">
+    <div>状態: <span data-seabass-game-target="state">READY</span></div>
+    <div>残り時間: <span data-seabass-game-target="timer">180</span> 秒</div>
+    <div>
+      スコア: <span data-seabass-game-target="score">0</span>
+      匹数: <span data-seabass-game-target="catches">0</span>
+      自己ベスト: <span data-seabass-game-target="best">0</span>
+    </div>
+
+    <div class="meter">
+      <span class="meter__label">キャストパワー</span>
+      <div class="bar-bg"><div data-seabass-game-target="castBar" class="bar-fill bar-fill--cast"></div></div>
+    </div>
+    <div class="meter">
+      <span class="meter__label">巻き取り距離</span>
+      <div class="bar-bg"><div data-seabass-game-target="progressBar" class="bar-fill bar-fill--progress"></div></div>
+    </div>
+    <div class="meter">
+      <span class="meter__label">テンション</span>
+      <div class="bar-bg"><div data-seabass-game-target="tensionBar" class="bar-fill bar-fill--tension"></div></div>
+    </div>
+    <div class="meter">
+      <span class="meter__label">スタミナ</span>
+      <div class="bar-bg"><div data-seabass-game-target="staminaBar" class="bar-fill bar-fill--stamina"></div></div>
+    </div>
+
+    <div data-seabass-game-target="message" class="game-screen__message"></div>
+
+    <%= link_to "タイトルへ戻る", root_path, class: "btn btn--secondary" %>
+  </div>
+</div>
