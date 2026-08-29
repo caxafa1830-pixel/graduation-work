@@ -615,10 +615,11 @@ export default class extends Controller {
     ctx.lineCap = "butt"
   }
 
-  // ルアー本体の描画。単なる丸ではなく、細長いミノー型のルアーに見えるようにする
+  // ルアー本体の描画。単なる丸ではなく、細長いミノー型のルアーとはっきり分かるように大きめ・高コントラストで描く
   drawLure(ctx, x, y, highlighted) {
     ctx.save()
     ctx.translate(x, y)
+    ctx.scale(1.7, 1.7) // 小さい丸に見えないよう全体を拡大
 
     if (highlighted) {
       ctx.fillStyle = "rgba(255,224,138,0.45)"
@@ -627,41 +628,65 @@ export default class extends Controller {
       ctx.fill()
     }
 
-    // フック（針）
-    ctx.strokeStyle = "#9aa5ab"
-    ctx.lineWidth = 1
+    // フック（針）：赤系にしてはっきり見えるように
+    ctx.strokeStyle = "#c0392b"
+    ctx.lineWidth = 1.4
     ctx.beginPath()
-    ctx.moveTo(-6, 1)
-    ctx.quadraticCurveTo(-10, 7, -5, 8)
+    ctx.moveTo(-6, 1.5)
+    ctx.quadraticCurveTo(-11, 8, -5, 9)
     ctx.stroke()
 
-    // ボディ（細長い楕円、頭側から尾側にグラデーション）
-    const grad = ctx.createLinearGradient(-8, -4, 8, 4)
-    grad.addColorStop(0, highlighted ? "#fff3cf" : "#eaf6ff")
-    grad.addColorStop(0.5, highlighted ? "#ffd873" : "#7fd8ff")
-    grad.addColorStop(1, highlighted ? "#c98f2b" : "#2f7ea8")
-    ctx.fillStyle = grad
+    // 尾びれ風のテール
+    ctx.fillStyle = highlighted ? "#c98f2b" : "#2f7ea8"
     ctx.beginPath()
-    ctx.ellipse(0, 0, 8, 3.5, 0, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.strokeStyle = "#1c3f52"
-    ctx.lineWidth = 0.8
-    ctx.stroke()
-
-    // リップ（頭部の小さな板）
-    ctx.fillStyle = "rgba(230,240,245,0.85)"
-    ctx.beginPath()
-    ctx.moveTo(7, -1)
-    ctx.lineTo(12, -3)
-    ctx.lineTo(12, 2)
-    ctx.lineTo(7, 2)
+    ctx.moveTo(-8, 0)
+    ctx.lineTo(-13, -4)
+    ctx.lineTo(-13, 4)
     ctx.closePath()
     ctx.fill()
 
-    // 目
+    // ボディ（細長い楕円、頭側から尾側にグラデーション）
+    const grad = ctx.createLinearGradient(-9, -5, 9, 5)
+    grad.addColorStop(0, highlighted ? "#fff3cf" : "#eaf6ff")
+    grad.addColorStop(0.45, highlighted ? "#ffd873" : "#7fd8ff")
+    grad.addColorStop(1, highlighted ? "#c98f2b" : "#2f7ea8")
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.ellipse(0, 0, 9, 4, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = "#16232c"
+    ctx.lineWidth = 1
+    ctx.stroke()
+
+    // 体側のライン模様（ルアーらしい塗装ライン）
+    ctx.strokeStyle = "rgba(22,35,44,0.6)"
+    ctx.lineWidth = 0.8
+    ctx.beginPath()
+    ctx.moveTo(-7, 0)
+    ctx.lineTo(7, 0)
+    ctx.stroke()
+
+    // リップ（頭部の小さな透明な板）
+    ctx.fillStyle = "rgba(230,240,245,0.9)"
+    ctx.strokeStyle = "rgba(22,35,44,0.6)"
+    ctx.lineWidth = 0.6
+    ctx.beginPath()
+    ctx.moveTo(7.5, -1.5)
+    ctx.lineTo(14, -4)
+    ctx.lineTo(14, 3)
+    ctx.lineTo(7.5, 2.5)
+    ctx.closePath()
+    ctx.fill()
+    ctx.stroke()
+
+    // 目（白目+黒目でくっきり）
+    ctx.fillStyle = "#ffffff"
+    ctx.beginPath()
+    ctx.arc(5, -0.8, 1.6, 0, Math.PI * 2)
+    ctx.fill()
     ctx.fillStyle = "#16232c"
     ctx.beginPath()
-    ctx.arc(4.5, -0.5, 1, 0, Math.PI * 2)
+    ctx.arc(5.3, -0.8, 0.9, 0, Math.PI * 2)
     ctx.fill()
 
     ctx.restore()
