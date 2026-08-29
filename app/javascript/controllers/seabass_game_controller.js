@@ -85,8 +85,10 @@ export default class extends Controller {
     this.fishSize = 0
     this.caughtFish = false
     this.flying = false
-    this.flyFrom = 0
-    this.flyTo = 0
+    this.flyFromX = 0
+    this.flyFromY = 0
+    this.flyToX = 0
+    this.flyToY = 0
     this.flyElapsed = 0
     this.flyDuration = 0
     this.landSplashTimer = 0
@@ -151,15 +153,19 @@ export default class extends Controller {
     // パワーが低いと岸の近くにしか届かず、探れる範囲（＝バイトのチャンス）が短くなる。
     const power = Math.round(this.castPower)
     const targetProgress = Math.max(0, 40 - power * 0.4)
+    const canvas = this.canvasTarget
+    const rodTip = this.rodTipPosition(canvas)
 
-    // ルアーが竿先（岸側）から着水地点まで飛んでいくアニメーション。
-    // パワーが強いほど飛距離が長く見え、飛んでいる時間も少し長くなる。
+    // ルアーが竿先から着水地点まで飛んでいくアニメーション（見た目だけの動き）。
+    // リトリーブ距離（ゲームロジック）は着水地点にすでに確定させておく。
     this.flying = true
-    this.flyFrom = 100
-    this.flyTo = targetProgress
+    this.flyFromX = rodTip.x
+    this.flyFromY = rodTip.y
+    this.flyToX = 60 + (canvas.width - 140) * (targetProgress / 100)
+    this.flyToY = 250
     this.flyElapsed = 0
     this.flyDuration = 300 + power * 3
-    this.lureProgress = this.flyFrom
+    this.lureProgress = targetProgress
 
     this.tapTimestamps = []
     this.stayTimer = 0
@@ -169,14 +175,21 @@ export default class extends Controller {
 
   updateFlying(dt) {
     this.flyElapsed += dt
-    const t = Math.min(1, this.flyElapsed / this.flyDuration)
-    const eased = 1 - Math.pow(1 - t, 2) // イーズアウトで着水直前に減速する
-    this.lureProgress = this.flyFrom + (this.flyTo - this.flyFrom) * eased
-    if (t >= 1) {
+    if (this.flyElapsed >= this.flyDuration) {
       this.flying = false
-      this.lureProgress = this.flyTo
       this.landSplashTimer = 260
     }
+  }
+
+  // 竿先（ルアーがぶら下がる/飛び出す起点）の座標を計算する。drawAnglerの竿の形と一致させる
+  rodTipPosition(canvas) {
+    const ax = canvas.width - 22
+    const ay = 132
+    const rodBaseX = ax - 5
+    const rodBaseY = ay - 6
+    const rodTipX = rodBaseX - 55
+    const rodTipY = rodBaseY - 32
+    return { x: rodTipX + 4, y: rodTipY + 18 }
   }
 
   doTwitch() {
@@ -384,15 +397,32 @@ export default class extends Controller {
     const canvas = this.canvasTarget
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    const lureX = 60 + (canvas.width - 140) * (this.lureProgress / 100)
-    const lureY = 250
+    const S = this.constructor.STATE
+
+    // ルアーの表示位置を状態ごとに決める。
+    // ・READY/CASTING中: 竿先にぶら下がっている
+    // ・キャスト直後(flying中): 竿先から着水地点までアーチを描いて飛んでいく
+    // ・それ以外: リトリーブ距離(lureProgress)に応じた水面上の位置
+    let lureX = 60 + (canvas.width - 140) * (this.lureProgress / 100)
+    let lureY = 250
+
+    if (this.state === S.READY || this.state === S.CASTING) {
+      const tip = this.rodTipPosition(canvas)
+      lureX = tip.x
+      lureY = tip.y
+    } else if (this.flying) {
+      const t = Math.min(1, this.flyElapsed / this.flyDuration)
+      const eased = 1 - Math.pow(1 - t, 2) // イーズアウトで着水直前に減速する
+      lureX = this.flyFromX + (this.flyToX - this.flyFromX) * eased
+      // 縦方向は放物線を描くようにして、投げた感じを出す
+      const arc = Math.sin(t * Math.PI) * 40
+      lureY = this.flyFromY + (this.flyToY - this.flyFromY) * eased - arc
+    }
 
     this.drawSky(ctx, canvas)
     this.drawWater(ctx, canvas)
     this.drawShore(ctx, canvas)
     this.drawAngler(ctx, canvas, lureX, lureY)
-
-    const S = this.constructor.STATE
 
     if (this.twitchFlashTimer > 0) {
       ctx.strokeStyle = "rgba(127,216,255,0.8)"
