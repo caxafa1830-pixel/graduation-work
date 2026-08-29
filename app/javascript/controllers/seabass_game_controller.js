@@ -84,6 +84,12 @@ export default class extends Controller {
     this.resultText = ""
     this.fishSize = 0
     this.caughtFish = false
+    this.flying = false
+    this.flyFrom = 0
+    this.flyTo = 0
+    this.flyElapsed = 0
+    this.flyDuration = 0
+    this.landSplashTimer = 0
   }
 
   // ---- 入力 ----
@@ -144,11 +150,33 @@ export default class extends Controller {
     // キャストパワーが高いほど遠くまで飛び、リトリーブの開始位置（岸からの距離）が遠くなる。
     // パワーが低いと岸の近くにしか届かず、探れる範囲（＝バイトのチャンス）が短くなる。
     const power = Math.round(this.castPower)
-    this.lureProgress = Math.max(0, 40 - power * 0.4)
+    const targetProgress = Math.max(0, 40 - power * 0.4)
+
+    // ルアーが竿先（岸側）から着水地点まで飛んでいくアニメーション。
+    // パワーが強いほど飛距離が長く見え、飛んでいる時間も少し長くなる。
+    this.flying = true
+    this.flyFrom = 100
+    this.flyTo = targetProgress
+    this.flyElapsed = 0
+    this.flyDuration = 300 + power * 3
+    this.lureProgress = this.flyFrom
+
     this.tapTimestamps = []
     this.stayTimer = 0
     this.biteAccum = 0
     this.msg(`キャスト！ 飛距離パワー ${power}%（遠くまで飛ぶほど探れる範囲が広がる）`)
+  }
+
+  updateFlying(dt) {
+    this.flyElapsed += dt
+    const t = Math.min(1, this.flyElapsed / this.flyDuration)
+    const eased = 1 - Math.pow(1 - t, 2) // イーズアウトで着水直前に減速する
+    this.lureProgress = this.flyFrom + (this.flyTo - this.flyFrom) * eased
+    if (t >= 1) {
+      this.flying = false
+      this.lureProgress = this.flyTo
+      this.landSplashTimer = 260
+    }
   }
 
   doTwitch() {
@@ -202,6 +230,7 @@ export default class extends Controller {
     if (this.state === S.GAMEOVER) return
 
     if (this.twitchFlashTimer > 0) this.twitchFlashTimer -= dt
+    if (this.landSplashTimer > 0) this.landSplashTimer -= dt
 
     if (this.state !== S.RESULT) {
       this.gameTimeAccum += dt
@@ -220,7 +249,13 @@ export default class extends Controller {
       this.castPower = Math.min(100, held / 12)
     }
 
-    if (this.state === S.RETRIEVING) this.updateRetrieving(dt)
+    if (this.state === S.RETRIEVING) {
+      if (this.flying) {
+        this.updateFlying(dt)
+      } else {
+        this.updateRetrieving(dt)
+      }
+    }
     if (this.state === S.BITE) this.updateBite(dt)
     if (this.state === S.FIGHT) this.updateFight(dt)
     if (this.state === S.RESULT) this.updateResult(dt)
@@ -363,6 +398,16 @@ export default class extends Controller {
       ctx.strokeStyle = "rgba(127,216,255,0.8)"
       ctx.beginPath()
       ctx.arc(lureX, lureY, 20 - this.twitchFlashTimer / 10, 0, Math.PI * 2)
+      ctx.stroke()
+    }
+
+    if (this.landSplashTimer > 0) {
+      // 着水した瞬間の水しぶき。時間経過で輪が広がりながら消える
+      const p = 1 - this.landSplashTimer / 260
+      ctx.strokeStyle = `rgba(220,240,255,${0.7 * (1 - p)})`
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.ellipse(lureX, lureY, 8 + p * 26, 4 + p * 10, 0, 0, Math.PI * 2)
       ctx.stroke()
     }
 
