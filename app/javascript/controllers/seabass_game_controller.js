@@ -141,11 +141,14 @@ export default class extends Controller {
   doCast() {
     const S = this.constructor.STATE
     this.state = S.RETRIEVING
-    this.lureProgress = 0
+    // キャストパワーが高いほど遠くまで飛び、リトリーブの開始位置（岸からの距離）が遠くなる。
+    // パワーが低いと岸の近くにしか届かず、探れる範囲（＝バイトのチャンス）が短くなる。
+    const power = Math.round(this.castPower)
+    this.lureProgress = Math.max(0, 40 - power * 0.4)
     this.tapTimestamps = []
     this.stayTimer = 0
     this.biteAccum = 0
-    this.msg(`キャスト！ 飛距離パワー ${Math.round(this.castPower)}%`)
+    this.msg(`キャスト！ 飛距離パワー ${power}%（遠くまで飛ぶほど探れる範囲が広がる）`)
   }
 
   doTwitch() {
