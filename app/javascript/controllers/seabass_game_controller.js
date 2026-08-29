@@ -449,10 +449,7 @@ export default class extends Controller {
       this.drawBiteMark(ctx, lureX, lureY)
     }
 
-    ctx.fillStyle = this.state === S.BITE ? "#ffe08a" : "#7fd8ff"
-    ctx.beginPath()
-    ctx.arc(lureX, lureY, 8, 0, Math.PI * 2)
-    ctx.fill()
+    this.drawLure(ctx, lureX, lureY, this.state === S.BITE)
 
     ctx.font = "13px sans-serif"
     if (this.state === S.CASTING || this.state === S.READY) {
@@ -616,6 +613,58 @@ export default class extends Controller {
     }
     ctx.stroke()
     ctx.lineCap = "butt"
+  }
+
+  // ルアー本体の描画。単なる丸ではなく、細長いミノー型のルアーに見えるようにする
+  drawLure(ctx, x, y, highlighted) {
+    ctx.save()
+    ctx.translate(x, y)
+
+    if (highlighted) {
+      ctx.fillStyle = "rgba(255,224,138,0.45)"
+      ctx.beginPath()
+      ctx.arc(0, 0, 13, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    // フック（針）
+    ctx.strokeStyle = "#9aa5ab"
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(-6, 1)
+    ctx.quadraticCurveTo(-10, 7, -5, 8)
+    ctx.stroke()
+
+    // ボディ（細長い楕円、頭側から尾側にグラデーション）
+    const grad = ctx.createLinearGradient(-8, -4, 8, 4)
+    grad.addColorStop(0, highlighted ? "#fff3cf" : "#eaf6ff")
+    grad.addColorStop(0.5, highlighted ? "#ffd873" : "#7fd8ff")
+    grad.addColorStop(1, highlighted ? "#c98f2b" : "#2f7ea8")
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.ellipse(0, 0, 8, 3.5, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = "#1c3f52"
+    ctx.lineWidth = 0.8
+    ctx.stroke()
+
+    // リップ（頭部の小さな板）
+    ctx.fillStyle = "rgba(230,240,245,0.85)"
+    ctx.beginPath()
+    ctx.moveTo(7, -1)
+    ctx.lineTo(12, -3)
+    ctx.lineTo(12, 2)
+    ctx.lineTo(7, 2)
+    ctx.closePath()
+    ctx.fill()
+
+    // 目
+    ctx.fillStyle = "#16232c"
+    ctx.beginPath()
+    ctx.arc(4.5, -0.5, 1, 0, Math.PI * 2)
+    ctx.fill()
+
+    ctx.restore()
   }
 
   // バイト中〜ファイト中、ルアーの上に「！」マークを表示する（食いついたことを分かりやすくする）
