@@ -1,4 +1,7 @@
-<div data-controller="seabass-game" class="game-screen">
+<div data-controller="seabass-game"
+     data-seabass-game-best-value="<%= @best_score %>"
+     data-seabass-game-catch-records-url-value="<%= catch_records_path %>"
+     class="game-screen">
   <canvas data-seabass-game-target="canvas" width="640" height="360"></canvas>
 
   <div class="game-screen__panel">
@@ -7,7 +10,7 @@
     <div>
       スコア: <span data-seabass-game-target="score">0</span>
       匹数: <span data-seabass-game-target="catches">0</span>
-      自己ベスト: <span data-seabass-game-target="best">0</span>
+      自己ベスト（1匹）: <span data-seabass-game-target="best">0</span>
     </div>
 
     <div class="meter">

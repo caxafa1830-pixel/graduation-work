@@ -121,3 +121,135 @@ body {
   font-weight: bold;
   margin: 10px 0;
 }
+
+.site-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(13, 27, 36, 0.5);
+}
+
+.site-header__user {
+  font-size: 13px;
+  color: #9db6c2;
+  margin-right: 4px;
+}
+
+.btn--small {
+  padding: 6px 14px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.flash {
+  max-width: 640px;
+  margin: 10px auto 0;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.flash--notice {
+  background: rgba(127, 255, 176, 0.15);
+  color: #7fffb0;
+  border: 1px solid rgba(127, 255, 176, 0.35);
+}
+
+.flash--alert {
+  background: rgba(255, 127, 127, 0.15);
+  color: #ff7f7f;
+  border: 1px solid rgba(255, 127, 127, 0.35);
+}
+
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.records-table th, .records-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(127, 216, 255, 0.2);
+  text-align: left;
+}
+
+.records-table th {
+  color: #9db6c2;
+  font-size: 13px;
+}
+
+.auth-field {
+  text-align: left;
+  margin-bottom: 14px;
+}
+
+.auth-field label {
+  display: block;
+  font-size: 13px;
+  color: #9db6c2;
+  margin-bottom: 4px;
+}
+
+.auth-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #3a5a6d;
+  background: #0d1b24;
+  color: #eaf2f5;
+  font-size: 14px;
+}
+
+.auth-field--checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.auth-field--checkbox label {
+  margin-bottom: 0;
+}
+
+.auth-hint {
+  display: block;
+  font-size: 11px;
+  color: #6f8894;
+  margin-bottom: 4px;
+}
+
+.auth-actions {
+  margin-top: 18px;
+}
+
+.auth-links {
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.auth-links a {
+  color: #7fd8ff;
+}
+
+.auth-errors {
+  background: rgba(255, 127, 127, 0.12);
+  border: 1px solid rgba(255, 127, 127, 0.35);
+  color: #ff7f7f;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.auth-errors h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.auth-errors ul {
+  margin: 0;
+  padding-left: 18px;
+}

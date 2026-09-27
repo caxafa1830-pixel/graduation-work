@@ -1,0 +1,31 @@
+<div class="how-to-play">
+  <h1>捕獲記録</h1>
+
+  <% if @catch_records.any? %>
+    <table class="records-table">
+      <thead>
+        <tr>
+          <th>サイズ</th>
+          <th>スコア</th>
+          <th>釣れた日時</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @catch_records.each do |record| %>
+          <tr>
+            <td><%= record.fish_size_cm %> cm</td>
+            <td><%= record.score %> pt</td>
+            <td><%= record.created_at.strftime("%Y/%m/%d %H:%M") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p>まだ捕獲記録がありません。プレイしてシーバスを釣り上げましょう。</p>
+  <% end %>
+
+  <div class="how-to-play__buttons">
+    <%= link_to "プレイ画面へ", game_path, class: "btn btn--primary" %>
+    <%= link_to "戻る", root_path, class: "btn btn--secondary" %>
+  </div>
+</div>

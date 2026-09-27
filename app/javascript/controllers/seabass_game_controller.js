@@ -11,6 +11,13 @@ export default class extends Controller {
     "message", "castBar", "progressBar", "tensionBar", "staminaBar"
   ]
 
+  // best: サーバー(捕獲記録)から渡される自己ベストの初期値
+  // catchRecordsUrl: 捕獲記録を保存するAPIのURL（catch_records_path）
+  static values = {
+    best: Number,
+    catchRecordsUrl: String
+  }
+
   static STATE = {
     READY: "READY",
     CASTING: "CASTING",
@@ -21,8 +28,6 @@ export default class extends Controller {
     GAMEOVER: "GAMEOVER"
   }
 
-  static BEST_SCORE_KEY = "seabassCup.bestScore"
-  static BEST_SIZE_KEY = "seabassCup.bestSize"
   static HOOK_WINDOW_MS = 450
   static GAME_SECONDS = 180
 
@@ -56,8 +61,8 @@ export default class extends Controller {
     this.timeLeft = this.constructor.GAME_SECONDS
     this.score = 0
     this.catches = 0
-    this.best = Number(localStorage.getItem(this.constructor.BEST_SCORE_KEY) || 0)
-    this.bestSize = Number(localStorage.getItem(this.constructor.BEST_SIZE_KEY) || 0)
+    // 自己ベストはサーバー(捕獲記録)から渡された値を初期値とする。以後はキャッチのたびにサーバーの最新値で更新する。
+    this.best = this.hasBestValue ? this.bestValue : 0
 
     this.gameTimeAccum = 0
     this.resetForNextCast()
@@ -350,12 +355,41 @@ export default class extends Controller {
       const points = this.fishSize * 10
       this.score += points
       this.catches += 1
-      if (this.fishSize > this.bestSize) this.bestSize = this.fishSize
       this.caughtFish = true
       this.resultText = `キャッチ！ シーバス ${this.fishSize}cm (+${points}pt)`
       this.state = S.RESULT
       this.resultTimer = 2200
+      this.saveCatchRecord(this.fishSize, points)
     }
+  }
+
+  // 捕獲記録をサーバーに保存する。保存に成功したらサーバー側で計算された最新の自己ベストを反映する。
+  saveCatchRecord(fishSizeCm, score) {
+    if (!this.hasCatchRecordsUrlValue) return
+
+    const tokenTag = document.querySelector('meta[name="csrf-token"]')
+    const token = tokenTag ? tokenTag.content : ""
+
+    fetch(this.catchRecordsUrlValue, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-CSRF-Token": token
+      },
+      body: JSON.stringify({
+        catch_record: { fish_size_cm: fishSizeCm, score: score }
+      })
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.ok && typeof data.best === "number") {
+          this.best = data.best
+        }
+      })
+      .catch(() => {
+        // 通信エラー時はプレイ続行を優先し、ここでは特にエラー表示しない
+      })
   }
 
   updateResult(dt) {
@@ -368,15 +402,7 @@ export default class extends Controller {
   finishCup() {
     const S = this.constructor.STATE
     this.state = S.GAMEOVER
-
-    // ISSUE: 自己ベスト（localStorage）機能
-    if (this.score > this.best) {
-      this.best = this.score
-      localStorage.setItem(this.constructor.BEST_SCORE_KEY, String(this.best))
-    }
-    if (this.bestSize > 0) {
-      localStorage.setItem(this.constructor.BEST_SIZE_KEY, String(this.bestSize))
-    }
+    // 自己ベストは捕獲記録の保存(saveCatchRecord)のたびにサーバー側の最新値へ更新済みのため、ここでは何もしない。
   }
 
   updateHud() {

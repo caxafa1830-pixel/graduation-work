@@ -1,0 +1,10 @@
+<% if resource.errors.any? %>
+  <div class="auth-errors">
+    <h3><%= pluralize(resource.errors.count, "件") %>のエラーが発生しました</h3>
+    <ul>
+      <% resource.errors.each do |error| %>
+        <li><%= error.full_message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

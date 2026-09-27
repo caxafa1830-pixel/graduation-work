@@ -30,3 +30,5 @@ group :test do
   gem "simplecov", require: false
 end
 gem "sprockets-rails"
+gem "devise"
+gem "devise-i18n"
